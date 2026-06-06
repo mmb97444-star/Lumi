@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LINE 貼圖 5 分鐘產生器</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">LINE Creators Market ready</p>
+          <h1>LINE 貼圖 / 動態貼圖產生器</h1>
+          <p class="lead">上傳最多 3 張參考圖，輸入用「、」分隔的文字，一鍵產生已分割的 PNG / APNG 與可上傳 ZIP。</p>
+        </div>
+        <div class="hero-card">
+          <strong>5 分鐘上架流程</strong>
+          <ol>
+            <li>選類型與上架張數</li>
+            <li>上傳參考圖 / 去背</li>
+            <li>生成 40 張候選圖</li>
+            <li>下載上架 ZIP</li>
+            <li>開啟 LINE Creators Market 上傳</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="panel grid-2">
+        <div>
+          <label for="stickerType">貼圖類型</label>
+          <select id="stickerType">
+            <option value="sticker">一般貼圖 PNG（最多 40 張）</option>
+            <option value="animated">動態貼圖 APNG（官方 8/16/24 張）</option>
+            <option value="popup">全螢幕貼圖 / Pop-up（官方 8/16/24 張）</option>
+            <option value="big">大貼圖 PNG（最多 40 張）</option>
+            <option value="emoji">表情貼 PNG（8–40 張）</option>
+          </select>
+        </div>
+        <div>
+          <label for="uploadCount">上架 ZIP 張數</label>
+          <select id="uploadCount"></select>
+        </div>
+        <div>
+          <label for="referenceImages">參考圖片（最多 3 張）</label>
+          <input id="referenceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+          <div id="referencePreview" class="preview-strip"></div>
+        </div>
+        <div>
+          <label for="stylePrompt">整體風格</label>
+          <input id="stylePrompt" value="可愛、粗黑描邊、日常聊天、高辨識度" />
+        </div>
+        <div class="wide">
+          <label for="stickerTexts">每張貼圖文字（用「、」隔開；不足會自動補同風格文字/表情）</label>
+          <textarea id="stickerTexts" rows="4" placeholder="早安、謝謝、收到、加油、晚安"></textarea>
+        </div>
+        <div class="toggles wide">
+          <label><input id="removeBg" type="checkbox" checked /> 生成時自動去背</label>
+          <label><input id="withText" type="checkbox" checked /> 允許貼圖文字</label>
+          <label><input id="safeMargins" type="checkbox" checked /> 套用官方安全邊界</label>
+        </div>
+        <div class="actions wide">
+          <button id="removeBgNow" class="secondary">一鍵去背參考圖</button>
+          <button id="generate" class="primary">產生 40 張貼圖</button>
+          <button id="downloadZip" disabled>下載上架 ZIP</button>
+          <button id="openLine" class="secondary">一鍵開啟 LINE 上架頁</button>
+        </div>
+      </section>
+
+      <section id="specPanel" class="panel specs"></section>
+      <section id="status" class="status">尚未產生。請先上傳參考圖片或直接用內建角色生成。</section>
+      <section id="gallery" class="gallery"></section>
+    </main>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

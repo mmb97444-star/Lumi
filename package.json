@@ -1,0 +1,11 @@
+{
+  "name": "lumi-line-sticker-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/check-app.mjs",
+    "test": "node scripts/check-app.mjs",
+    "dev": "python3 -m http.server 5173 -d public"
+  }
+}
