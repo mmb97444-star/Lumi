@@ -30,3 +30,9 @@ https://<github-username>.github.io/<repository-name>/
 ```
 
 Because the app uses relative asset paths, it works both locally and under a GitHub Pages repository subpath.
+
+## Mobile usage notes
+
+- The page is responsive and can be opened directly from a phone browser after GitHub Pages deploys it.
+- The reference image picker accepts up to 10 images from a phone album.
+- For real-person or realistic photos, use **真人 / 寫實照片轉換** and choose hand-drawn, chibi, literary, watercolor, or comic style before generating stickers.

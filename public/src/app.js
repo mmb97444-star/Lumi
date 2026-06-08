@@ -1,4 +1,5 @@
 const $ = (id) => document.getElementById(id);
+const MAX_REFERENCE_IMAGES = 10;
 
 const OFFICIAL_SPECS = {
   sticker: {
@@ -128,9 +129,10 @@ function renderSpecs() {
 }
 
 async function handleFiles(event) {
-  const files = [...event.target.files].slice(0, 3);
+  const files = [...event.target.files].slice(0, MAX_REFERENCE_IMAGES);
   references = await Promise.all(files.map(fileToImageData));
-  renderReferencePreview();
+  applyReferenceStyles();
+  setStatus(`已載入 ${references.length} 張參考圖${event.target.files.length > MAX_REFERENCE_IMAGES ? `（最多只取前 ${MAX_REFERENCE_IMAGES} 張）` : ""}。`);
 }
 
 function fileToImageData(file) {
@@ -145,7 +147,8 @@ function fileToImageData(file) {
       canvas.width = Math.max(2, Math.round(img.width * scale));
       canvas.height = Math.max(2, Math.round(img.height * scale));
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve({ canvas, name: file.name });
+      const photoScore = estimatePhotoScore(canvas);
+      resolve({ sourceCanvas: canvas, canvas: cloneCanvas(canvas), name: file.name, photoScore, detectedPhoto: photoScore > 0.52 });
     };
     img.onerror = reject;
     img.src = url;
@@ -154,12 +157,173 @@ function fileToImageData(file) {
 
 function renderReferencePreview() {
   $("referencePreview").innerHTML = "";
-  references.forEach((ref) => {
+  references.forEach((ref, index) => {
+    const item = document.createElement("figure");
+    item.className = "reference-item";
     const img = new Image();
     img.src = ref.canvas.toDataURL("image/png");
     img.alt = ref.name;
-    $("referencePreview").appendChild(img);
+    const cap = document.createElement("figcaption");
+    cap.textContent = `${String(index + 1).padStart(2, "0")} · ${ref.styleLabel}${ref.detectedPhoto ? " · 寫實偵測" : ""}`;
+    item.append(img, cap);
+    $("referencePreview").appendChild(item);
   });
+}
+
+function cloneCanvas(source) {
+  const canvas = makeCanvas(source.width, source.height);
+  canvas.getContext("2d").drawImage(source, 0, 0);
+  return canvas;
+}
+
+function estimatePhotoScore(canvas) {
+  const sample = makeCanvas(80, 80);
+  const ctx = sample.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(canvas, 0, 0, sample.width, sample.height);
+  const data = ctx.getImageData(0, 0, sample.width, sample.height).data;
+  let colorVariance = 0;
+  let midToneCount = 0;
+  let edgeCount = 0;
+  let previousLuma = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const luma = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    colorVariance += (max - min) / 255;
+    if (luma > 0.18 && luma < 0.88) midToneCount += 1;
+    if (Math.abs(luma - previousLuma) > 0.08) edgeCount += 1;
+    previousLuma = luma;
+  }
+  const total = data.length / 4;
+  return Math.min(1, colorVariance / total * 0.45 + midToneCount / total * 0.35 + edgeCount / total * 0.2);
+}
+
+function getReferenceStyle(ref) {
+  const selected = $("photoStyle").value;
+  if (selected === "auto") return ($("treatAsPhoto").checked || ref.detectedPhoto) ? "handdrawn" : "original";
+  return selected;
+}
+
+function applyReferenceStyles() {
+  references = references.map((ref) => {
+    const style = getReferenceStyle(ref);
+    return { ...ref, canvas: applyPhotoStyle(ref.sourceCanvas, style), style, styleLabel: getPhotoStyleLabel(style) };
+  });
+  renderReferencePreview();
+}
+
+function getPhotoStyleLabel(style) {
+  return {
+    original: "原圖",
+    handdrawn: "手繪風",
+    chibi: "Q版",
+    literary: "文青風",
+    watercolor: "水彩風",
+    comic: "漫畫風"
+  }[style] || "自動";
+}
+
+function applyPhotoStyle(source, style) {
+  const canvas = cloneCanvas(source);
+  if (style === "original") return canvas;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const filterMap = {
+    handdrawn: "saturate(1.25) contrast(1.18) brightness(1.06)",
+    chibi: "saturate(1.45) contrast(1.08) brightness(1.12)",
+    literary: "sepia(.18) saturate(.72) contrast(.92) brightness(1.08)",
+    watercolor: "saturate(1.15) contrast(.82) brightness(1.14) blur(.4px)",
+    comic: "saturate(1.35) contrast(1.5) brightness(1.04)"
+  };
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.filter = filterMap[style] || "none";
+  ctx.drawImage(source, 0, 0);
+  ctx.filter = "none";
+  posterizeCanvas(canvas, style);
+  drawStyleFinish(canvas, style);
+  return canvas;
+}
+
+function posterizeCanvas(canvas, style) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = image.data;
+  const steps = style === "literary" ? 24 : style === "watercolor" ? 32 : 38;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 10) continue;
+    data[i] = Math.round(data[i] / steps) * steps;
+    data[i + 1] = Math.round(data[i + 1] / steps) * steps;
+    data[i + 2] = Math.round(data[i + 2] / steps) * steps;
+    if (style === "literary") data[i + 3] = Math.min(255, data[i + 3] * 0.96);
+  }
+  ctx.putImageData(image, 0, 0);
+}
+
+function drawStyleFinish(canvas, style) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (["handdrawn", "chibi", "comic"].includes(style)) drawInkEdges(ctx, canvas.width, canvas.height, style === "comic" ? 36 : 48);
+  if (style === "chibi") drawChibiBubble(ctx, canvas.width, canvas.height);
+  if (style === "literary" || style === "watercolor") drawPaperTexture(ctx, canvas.width, canvas.height, style);
+  if (style === "comic") drawComicDots(ctx, canvas.width, canvas.height);
+}
+
+function drawInkEdges(ctx, width, height, threshold) {
+  const image = ctx.getImageData(0, 0, width, height);
+  const data = image.data;
+  ctx.save();
+  ctx.globalAlpha = 0.82;
+  ctx.fillStyle = "#111827";
+  for (let y = 1; y < height - 1; y += 2) {
+    for (let x = 1; x < width - 1; x += 2) {
+      const i = (y * width + x) * 4;
+      const j = (y * width + x + 1) * 4;
+      const k = ((y + 1) * width + x) * 4;
+      if (data[i + 3] < 20) continue;
+      const d = Math.abs(data[i] - data[j]) + Math.abs(data[i + 1] - data[j + 1]) + Math.abs(data[i + 2] - data[j + 2]) + Math.abs(data[i] - data[k]);
+      if (d > threshold) ctx.fillRect(x, y, 2, 2);
+    }
+  }
+  ctx.restore();
+}
+
+function drawChibiBubble(ctx, width, height) {
+  const radius = Math.min(width, height) * 0.18;
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = "rgba(255, 255, 255, .88)";
+  ctx.beginPath();
+  ctx.roundRect(width * 0.04, height * 0.04, width * 0.92, height * 0.92, radius);
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle = "#111827";
+  ctx.lineWidth = Math.max(8, Math.min(width, height) * 0.035);
+  ctx.beginPath();
+  ctx.roundRect(width * 0.04, height * 0.04, width * 0.92, height * 0.92, radius);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPaperTexture(ctx, width, height, style) {
+  ctx.save();
+  ctx.globalAlpha = style === "watercolor" ? 0.16 : 0.1;
+  for (let i = 0; i < 220; i += 1) {
+    const tone = 210 + (i % 35);
+    ctx.fillStyle = `rgb(${tone}, ${tone - 5}, ${tone - 16})`;
+    ctx.fillRect((i * 37) % width, (i * 53) % height, 1 + (i % 3), 1 + (i % 2));
+  }
+  ctx.restore();
+}
+
+function drawComicDots(ctx, width, height) {
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = "#111827";
+  for (let y = 6; y < height; y += 12) {
+    for (let x = 6; x < width; x += 12) {
+      ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  ctx.restore();
 }
 
 function removeBackgroundFromCanvas(canvas, tolerance = 46) {
@@ -178,8 +342,11 @@ function removeBackgroundFromCanvas(canvas, tolerance = 46) {
 }
 
 function oneClickRemoveBg() {
-  references.forEach((ref) => removeBackgroundFromCanvas(ref.canvas));
-  renderReferencePreview();
+  references.forEach((ref) => {
+    removeBackgroundFromCanvas(ref.sourceCanvas);
+    removeBackgroundFromCanvas(ref.canvas);
+  });
+  applyReferenceStyles();
   setStatus(`已完成 ${references.length} 張參考圖去背。`);
 }
 
@@ -203,7 +370,7 @@ function splitTextCandidates(input) {
 }
 
 function analyzeStickerIntent(text, index) {
-  const style = $("stylePrompt").value.trim().toLowerCase();
+  const style = `${$("stylePrompt").value} ${getPhotoStyleLabel($("photoStyle").value)}`.trim().toLowerCase();
   const haystack = `${text} ${style}`.toLowerCase();
   const expression = EXPRESSION_RULES.find((rule) => rule.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()))) || EXPRESSION_RULES[index % EXPRESSION_RULES.length];
   const pose = POSE_RULES.find((rule) => rule.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()))) || POSE_RULES[index % POSE_RULES.length];
@@ -309,7 +476,8 @@ function drawSticker(spec, index, text, size, frame = 0, frameCount = 1, intent 
 function drawReferenceSticker(ctx, image, size, index, pulse, margin, intent) {
   const maxW = size.w - margin * 2;
   const maxH = size.h * (size.h > size.w ? 0.64 : 0.7) - margin;
-  const scale = Math.min(maxW / image.width, maxH / image.height) * (0.88 + (index % 5) * 0.025 + pulse);
+  const styleBoost = $("photoStyle").value === "chibi" ? 1.08 : 1;
+  const scale = Math.min(maxW / image.width, maxH / image.height) * (0.88 + (index % 5) * 0.025 + pulse) * styleBoost;
   const w = image.width * scale;
   const h = image.height * scale;
   ctx.shadowColor = "rgba(0,0,0,.22)";
@@ -658,6 +826,8 @@ function openLineCreator() { window.open("https://creator.line.me/", "_blank", "
 
 $("stickerType").addEventListener("change", updateCounts);
 $("referenceImages").addEventListener("change", handleFiles);
+$("photoStyle").addEventListener("change", () => { applyReferenceStyles(); setStatus(`已套用 ${getPhotoStyleLabel(getReferenceStyle(references[0] || { detectedPhoto: true }))} 參考圖風格。`); });
+$("treatAsPhoto").addEventListener("change", applyReferenceStyles);
 $("removeBgNow").addEventListener("click", oneClickRemoveBg);
 $("generate").addEventListener("click", generateAll);
 $("downloadZip").addEventListener("click", downloadZip);
