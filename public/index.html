@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LINE 貼圖 5 分鐘產生器</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="shell">
@@ -12,7 +12,7 @@
         <div>
           <p class="eyebrow">LINE Creators Market ready</p>
           <h1>LINE 貼圖 / 動態貼圖產生器</h1>
-          <p class="lead">上傳最多 3 張參考圖，輸入用「、」分隔的文字，一鍵產生已分割的 PNG / APNG 與可上傳 ZIP。</p>
+          <p class="lead">上傳最多 3 張參考圖，輸入用「、」分隔的文字；系統會依文案與提示詞判斷表情、動作、配件，並用可更新的貼圖文字資料庫補齊靈感。</p>
         </div>
         <div class="hero-card">
           <strong>5 分鐘上架流程</strong>
@@ -51,8 +51,23 @@
           <input id="stylePrompt" value="可愛、粗黑描邊、日常聊天、高辨識度" />
         </div>
         <div class="wide">
-          <label for="stickerTexts">每張貼圖文字（用「、」隔開；不足會自動補同風格文字/表情）</label>
+          <label for="stickerTexts">每張貼圖文字（用「、」隔開；不足會從資料庫自動補同風格文字/表情）</label>
           <textarea id="stickerTexts" rows="4" placeholder="早安、謝謝、收到、加油、晚安"></textarea>
+        </div>
+        <div class="wide trend-panel">
+          <div class="trend-head">
+            <label for="trendTexts">新貼圖文字追蹤 / 資料庫</label>
+            <span id="databaseCount" class="pill">0 句</span>
+          </div>
+          <p class="hint">把你在新貼圖、熱門貼圖頁看到的文案貼在這裡，按「加入資料庫」後會儲存在此瀏覽器，之後生成時自動作為表情與動作參考。</p>
+          <textarea id="trendTexts" rows="3" placeholder="例如：情緒穩定、請支援收銀、先不要、我沒事、好想下班"></textarea>
+          <div class="actions compact-actions">
+            <button id="importTrendTexts" type="button" class="secondary">加入資料庫</button>
+            <button id="useDatabaseTexts" type="button" class="secondary">套用資料庫前 40 句</button>
+            <button id="copyDatabaseTexts" type="button" class="secondary">複製貼圖文字</button>
+            <button id="clearTextDatabase" type="button" class="secondary danger">重置資料庫</button>
+          </div>
+          <textarea id="textDatabase" class="database-view" rows="4" readonly></textarea>
         </div>
         <div class="toggles wide">
           <label><input id="removeBg" type="checkbox" checked /> 生成時自動去背</label>
@@ -71,6 +86,6 @@
       <section id="status" class="status">尚未產生。請先上傳參考圖片或直接用內建角色生成。</section>
       <section id="gallery" class="gallery"></section>
     </main>
-    <script type="module" src="/src/app.js"></script>
+    <script type="module" src="./src/app.js"></script>
   </body>
 </html>
