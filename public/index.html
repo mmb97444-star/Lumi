@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LINE 貼圖 5 分鐘產生器</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="shell">
@@ -12,13 +12,13 @@
         <div>
           <p class="eyebrow">LINE Creators Market ready</p>
           <h1>LINE 貼圖 / 動態貼圖產生器</h1>
-          <p class="lead">上傳最多 3 張參考圖，輸入用「、」分隔的文字，一鍵產生已分割的 PNG / APNG 與可上傳 ZIP。</p>
+          <p class="lead">手機也能直接使用；可上傳最多 10 張角色參考圖，真人/寫實照片可先套用手繪、Q版、文青等風格，再依文字與提示詞產生貼圖。</p>
         </div>
         <div class="hero-card">
           <strong>5 分鐘上架流程</strong>
           <ol>
             <li>選類型與上架張數</li>
-            <li>上傳參考圖 / 去背</li>
+            <li>手機上傳 1–10 張參考圖 / 去背</li>
             <li>生成 40 張候選圖</li>
             <li>下載上架 ZIP</li>
             <li>開啟 LINE Creators Market 上傳</li>
@@ -42,17 +42,44 @@
           <select id="uploadCount"></select>
         </div>
         <div>
-          <label for="referenceImages">參考圖片（最多 3 張）</label>
+          <label for="referenceImages">參考圖片（最多 10 張，手機可直接選相簿）</label>
           <input id="referenceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+          <p class="hint small-hint">若上傳真人或寫實照片，請先選下方轉換風格；本工具會在瀏覽器內用濾鏡、描邊與紙感效果轉成貼圖參考。</p>
           <div id="referencePreview" class="preview-strip"></div>
         </div>
-        <div>
+        <div class="style-stack">
           <label for="stylePrompt">整體風格</label>
           <input id="stylePrompt" value="可愛、粗黑描邊、日常聊天、高辨識度" />
+          <label for="photoStyle">真人 / 寫實照片轉換</label>
+          <select id="photoStyle">
+            <option value="auto">自動判斷：寫實照片轉手繪風</option>
+            <option value="original">保留原圖</option>
+            <option value="handdrawn">手繪風：粗黑描邊 + 色塊簡化</option>
+            <option value="chibi">Q版：圓潤放大 + 糖果色</option>
+            <option value="literary">文青風格：柔和紙感 + 低飽和</option>
+            <option value="watercolor">水彩風：柔霧淡彩</option>
+            <option value="comic">漫畫風：高對比網點</option>
+          </select>
+          <label class="inline-check"><input id="treatAsPhoto" type="checkbox" /> 這批圖是真人 / 寫實照片，強制套用轉換</label>
         </div>
         <div class="wide">
-          <label for="stickerTexts">每張貼圖文字（用「、」隔開；不足會自動補同風格文字/表情）</label>
+          <label for="stickerTexts">每張貼圖文字（用「、」隔開；不足會從資料庫自動補同風格文字/表情）</label>
           <textarea id="stickerTexts" rows="4" placeholder="早安、謝謝、收到、加油、晚安"></textarea>
+        </div>
+        <div class="wide trend-panel">
+          <div class="trend-head">
+            <label for="trendTexts">新貼圖文字追蹤 / 資料庫</label>
+            <span id="databaseCount" class="pill">0 句</span>
+          </div>
+          <p class="hint">把你在新貼圖、熱門貼圖頁看到的文案貼在這裡，按「加入資料庫」後會儲存在此瀏覽器，之後生成時自動作為表情與動作參考。</p>
+          <textarea id="trendTexts" rows="3" placeholder="例如：情緒穩定、請支援收銀、先不要、我沒事、好想下班"></textarea>
+          <div class="actions compact-actions">
+            <button id="importTrendTexts" type="button" class="secondary">加入資料庫</button>
+            <button id="useDatabaseTexts" type="button" class="secondary">套用資料庫前 40 句</button>
+            <button id="copyDatabaseTexts" type="button" class="secondary">複製貼圖文字</button>
+            <button id="clearTextDatabase" type="button" class="secondary danger">重置資料庫</button>
+          </div>
+          <textarea id="textDatabase" class="database-view" rows="4" readonly></textarea>
         </div>
         <div class="toggles wide">
           <label><input id="removeBg" type="checkbox" checked /> 生成時自動去背</label>
@@ -71,6 +98,6 @@
       <section id="status" class="status">尚未產生。請先上傳參考圖片或直接用內建角色生成。</section>
       <section id="gallery" class="gallery"></section>
     </main>
-    <script type="module" src="/src/app.js"></script>
+    <script type="module" src="./src/app.js"></script>
   </body>
 </html>
