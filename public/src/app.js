@@ -76,7 +76,7 @@ const EXPRESSION_RULES = [
   { id: "angry", label: "生氣", color: "#ff4d4f", emojis: ["💢", "🔥", "!"], keywords: ["怒", "生氣", "不爽", "氣", "煩", "吵", "不要", "不行", "閉嘴"] },
   { id: "cry", label: "哭哭", color: "#4dabf7", emojis: ["😭", "💧", "🥺"], keywords: ["哭", "淚", "難過", "委屈", "救命", "拜託", "心碎"] },
   { id: "surprised", label: "驚訝", color: "#845ef7", emojis: ["😲", "❗", "⚡"], keywords: ["蛤", "咦", "哇", "驚", "真的假的", "什麼", "？", "?"] },
-  { id: "sleepy", label: "疲倦", color: "#5c7cfa", emojis: ["😴", "💤", "🌙"], keywords: ["睡", "晚安", "累", "睏", "躺", "休息", "下班", "失神"] },
+  { id: "sleepy", label: "疲倦", color: "#5c7cfa", emojis: ["😴", "💤", "🌙"], keywords: ["睡", "晚安", "累", "睏", "躺", "休息", "下班", "失神", "醒醒"] },
   { id: "shy", label: "害羞", color: "#f783ac", emojis: ["😳", "💗", "✨"], keywords: ["害羞", "謝謝", "想你", "抱", "親", "愛你"] },
   { id: "smug", label: "得意", color: "#f59f00", emojis: ["😏", "😎", "👍"], keywords: ["懂", "可以", "沒問題", "掌聲", "超派", "帥", "chill", "尊重"] },
   { id: "confused", label: "疑惑", color: "#7048e8", emojis: ["🤔", "❓", "🌀"], keywords: ["不懂", "疑惑", "不理解", "為什麼", "怎樣", "隨便", "都行"] }
@@ -93,7 +93,7 @@ const POSE_RULES = [
   { id: "jump", label: "飛跳撒花", keywords: ["飛", "跳", "雲端", "開心", "派對", "閃亮"] },
   { id: "bow", label: "低頭拜託", keywords: ["拜託", "跪", "求", "不好意思", "抱歉", "謝罪"] },
   { id: "dizzy", label: "暈眩轉圈", keywords: ["暈", "忙瘋", "混亂", "昏", "不行了"] },
-  { id: "peek", label: "探頭偷看", keywords: ["看看", "偷看", "在嗎", "嗨", "哈囉"] },
+  { id: "peek", label: "探頭偷看", keywords: ["看看", "偷看", "在嗎", "嗨", "哈囉", "等等"] },
   { id: "umbrella", label: "撐傘散步", keywords: ["雨", "傘", "不錯", "保護", "撐"] },
   { id: "nope", label: "拒絕揮手", keywords: ["不要", "不管", "不想", "拒絕", "不可以", "不"] },
   { id: "crawl", label: "趴地爬行", keywords: ["爬", "不想動", "懶", "拖延", "趴"] },
@@ -377,11 +377,43 @@ function splitTextCandidates(input) {
   return uniqueTexts(input.split(/[、,，\n;；|]/).map((text) => text.replace(/^[\s#・*-]+|[\s#・*-]+$/g, "")));
 }
 
+function findIntentRule(text, rules) {
+  const normalized = String(text || "").toLowerCase();
+  const matches = rules.flatMap((rule) => rule.keywords
+    .filter((keyword) => normalized.includes(keyword.toLowerCase()))
+    .map((keyword) => ({ rule, score: keyword.length })));
+  matches.sort((a, b) => b.score - a.score);
+  return matches[0]?.rule;
+}
+
+function expressionForPose(pose, index) {
+  const defaults = {
+    phone: "surprised",
+    armsUp: "happy",
+    sleeping: "sleepy",
+    working: "sleepy",
+    eating: "smug",
+    hug: "shy",
+    facepalm: "confused",
+    chill: "smug",
+    jump: "happy",
+    bow: "shy",
+    dizzy: "confused",
+    peek: "surprised",
+    umbrella: "smug",
+    nope: "angry",
+    crawl: "sleepy",
+    cheek: "shy"
+  };
+  const fallbackId = defaults[pose.id];
+  return EXPRESSION_RULES.find((rule) => rule.id === fallbackId) || EXPRESSION_RULES[index % EXPRESSION_RULES.length];
+}
+
 function analyzeStickerIntent(text, index) {
-  const style = `${$("stylePrompt").value} ${getPhotoStyleLabel($("photoStyle").value)}`.trim().toLowerCase();
-  const haystack = `${text} ${style}`.toLowerCase();
-  const expression = EXPRESSION_RULES.find((rule) => rule.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()))) || EXPRESSION_RULES[index % EXPRESSION_RULES.length];
-  const pose = POSE_RULES.find((rule) => rule.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()))) || POSE_RULES[index % POSE_RULES.length];
+  // Text should drive each sticker's emotion and pose. The global style prompt must not
+  // force every generated sticker into the same "happy / hug" template.
+  const pose = findIntentRule(text, POSE_RULES) || POSE_RULES[index % POSE_RULES.length];
+  const expression = findIntentRule(text, EXPRESSION_RULES) || expressionForPose(pose, index);
   const motion = expression.id === "angry" || ["nope", "dizzy"].includes(pose.id) ? "shake" : expression.id === "sleepy" || ["chill", "umbrella"].includes(pose.id) ? "float" : expression.id === "cry" ? "drop" : ["armsUp", "jump"].includes(pose.id) ? "bounce" : "idle";
   return { expression, pose, motion, variant: index % 6 };
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/check-app.mjs",
-    "test": "node scripts/check-app.mjs",
+    "test": "node scripts/check-app.mjs && node scripts/check-intents.mjs",
     "dev": "python3 -m http.server 5173 -d public"
   }
 }

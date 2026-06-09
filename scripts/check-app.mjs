@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'node:fs';
 
-const required = ['public/index.html', 'public/styles.css', 'public/src/app.js', '.github/workflows/deploy-pages.yml', 'README.md'];
+const required = ['public/index.html', 'public/styles.css', 'public/src/app.js', '.github/workflows/deploy-pages.yml', 'README.md', 'scripts/check-intents.mjs'];
 for (const file of required) {
   const stat = statSync(file);
   if (!stat.isFile() || stat.size === 0) throw new Error(`${file} is missing or empty`);
