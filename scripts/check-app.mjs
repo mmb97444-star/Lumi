@@ -5,6 +5,12 @@ for (const file of required) {
   const stat = statSync(file);
   if (!stat.isFile() || stat.size === 0) throw new Error(`${file} is missing or empty`);
 }
+const conflictMarkerPattern = /^(<<<<<<<|=======|>>>>>>>) /m;
+for (const file of required) {
+  const content = readFileSync(file, 'utf8');
+  const marker = content.match(conflictMarkerPattern)?.[1];
+  if (marker) throw new Error(`Unresolved merge conflict marker ${marker} found in ${file}`);
+}
 const html = readFileSync('public/index.html', 'utf8');
 const js = readFileSync('public/src/app.js', 'utf8');
 const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8');
