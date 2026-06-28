@@ -10,6 +10,26 @@ npm run dev
 
 Open <http://localhost:5173/>.
 
+
+## Render deployment
+
+This repo includes `render.yaml`, so Render can host the static web version directly from the `public/` folder.
+
+### One-time Render setup
+
+1. Push this branch to GitHub.
+2. Open Render and choose **New → Blueprint**.
+3. Connect this repository and select the branch that contains `render.yaml`.
+4. Render will run `npm run build` and publish `./public`.
+5. After deployment, open the Render URL on macOS or mobile and use the app in the browser.
+
+Manual Render setup also works with:
+
+```text
+Build Command: npm run build
+Publish Directory: public
+```
+
 ## GitHub Pages deployment
 
 A GitHub Actions workflow is included at `.github/workflows/deploy-pages.yml`.

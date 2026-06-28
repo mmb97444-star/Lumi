@@ -13,11 +13,16 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: radial-gradient(circle at top left, #dfffe9, var(--bg) 34rem); color: var(--ink); }
 .shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 64px; }
-.hero { display: grid; grid-template-columns: 1fr 330px; gap: 24px; align-items: stretch; margin-bottom: 24px; }
+.hero { display: grid; grid-template-columns: 1fr 260px 330px; gap: 24px; align-items: stretch; margin-bottom: 24px; }
 .eyebrow { color: var(--line-dark); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
 h1 { font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: .96; margin: 0 0 16px; }
 .lead { color: var(--muted); font-size: 1.18rem; max-width: 680px; }
-.hero-card, .panel, .status { background: rgba(255,255,255,.86); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(16, 35, 27, .08); border-radius: 28px; padding: 24px; }
+.hero-card, .deploy-card, .panel, .status { background: rgba(255,255,255,.86); border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(16, 35, 27, .08); border-radius: 28px; padding: 24px; }
+.deploy-card { display: flex; flex-direction: column; justify-content: center; gap: 10px; background: linear-gradient(145deg, #10231b, #075a2a); color: #fff; }
+.deploy-card span { align-self: flex-start; border-radius: 999px; background: rgba(255,255,255,.15); padding: 6px 10px; font-size: .78rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.deploy-card strong { font-size: 1.25rem; line-height: 1.25; }
+.deploy-card p { margin: 0; color: rgba(255,255,255,.78); line-height: 1.5; }
+.deploy-card code { color: #b6ffd2; }
 .hero-card ol { margin: 12px 0 0; padding-left: 22px; color: var(--muted); }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .wide { grid-column: 1 / -1; }
@@ -68,8 +73,8 @@ button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
   body { background: linear-gradient(180deg, #e9fff1, var(--bg)); }
   .shell { width: 100%; padding: 14px 12px calc(84px + env(safe-area-inset-bottom)); }
   .hero { display: block; margin-bottom: 14px; }
-  .hero-card, .panel, .status { border-radius: 20px; padding: 16px; box-shadow: 0 10px 30px rgba(16, 35, 27, .06); }
-  .hero-card { margin-top: 14px; }
+  .hero-card, .deploy-card, .panel, .status { border-radius: 20px; padding: 16px; box-shadow: 0 10px 30px rgba(16, 35, 27, .06); }
+  .hero-card, .deploy-card { margin-top: 14px; }
   h1 { font-size: clamp(2rem, 12vw, 3.2rem); }
   .lead { font-size: 1rem; }
   input, textarea, select { font-size: 16px; min-height: 48px; padding: 12px; }
