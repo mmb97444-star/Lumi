@@ -12,7 +12,7 @@ const renderConfig = readFileSync('render.yaml', 'utf8');
 if (!html.includes('href="./styles.css"') || !html.includes('src="./src/app.js"')) {
   throw new Error('Static assets must use relative paths for GitHub Pages project URLs');
 }
-if (!html.includes('最多 10 張') || !html.includes('手機可直接選相簿') || !html.includes('Render Web 版')) {
+if (!html.includes('最多 10 張') || !html.includes('手機可直接選相簿') || !html.includes('Render Web 版') || !html.includes('Mac 關機也能用網址開啟')) {
   throw new Error('Mobile and Render deployment copy must be present');
 }
 if (!js.includes('slice(0, MAX_REFERENCE_IMAGES)') || !js.includes('detectedPhoto')) {
