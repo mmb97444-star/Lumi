@@ -108,11 +108,26 @@
           </div>
           <span id="customerCount" class="pill">0 位客戶</span>
         </div>
-        <p class="hint">在「客戶」欄位輸入公司名、聯絡人、電話或 Email，搜尋後會立即顯示客戶基本資料，方便業務快速查詢主資料。</p>
-        <div class="crm-search-row">
+        <p class="hint">在「公司」欄位輸入客戶公司名稱，或在「等級」選擇 A / B / C 後按搜尋，系統會篩選客戶清單並顯示客戶基本資料。</p>
+        <div class="crm-search-row crm-filter-grid">
           <div>
-            <label for="customerSearch">客戶</label>
-            <input id="customerSearch" list="customerOptions" type="search" placeholder="輸入客戶名稱 / 聯絡人 / 電話 / Email" autocomplete="off" />
+            <label for="companySearch">公司</label>
+            <input id="companySearch" type="search" placeholder="輸入公司名稱，例如：晨" autocomplete="off" />
+          </div>
+          <button id="companySearchButton" class="secondary search-button" type="button">搜尋</button>
+          <div>
+            <label for="levelSearch">等級</label>
+            <select id="levelSearch">
+              <option value="">全部等級</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <button id="levelSearchButton" class="secondary search-button" type="button">搜尋</button>
+          <div class="wide">
+            <label for="customerSearch">客戶快速搜尋</label>
+            <input id="customerSearch" list="customerOptions" type="search" placeholder="輸入公司 / 聯絡人 / 電話 / Email" autocomplete="off" />
             <datalist id="customerOptions"></datalist>
           </div>
           <button id="clearCustomerSearch" class="secondary" type="button">清除搜尋</button>

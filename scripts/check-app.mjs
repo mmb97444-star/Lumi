@@ -24,10 +24,10 @@ if (!workflow.includes('actions/deploy-pages') || !workflow.includes('path: publ
 if (!renderConfig.includes('runtime: static') || !renderConfig.includes('staticPublishPath: ./public') || !renderConfig.includes('buildCommand: npm run build') || !renderConfig.includes('generation: automatic')) {
   throw new Error('Render config must publish the static public directory');
 }
-for (const id of ['referenceImages', 'stickerType', 'uploadCount', 'stickerTexts', 'removeBgNow', 'generate', 'downloadZip', 'openLine', 'trendTexts', 'textDatabase', 'importTrendTexts', 'useDatabaseTexts', 'copyDatabaseTexts', 'clearTextDatabase', 'photoStyle', 'treatAsPhoto', 'customerSearch', 'customerResults', 'customerDetail', 'clearCustomerSearch', 'customerCount']) {
+for (const id of ['referenceImages', 'stickerType', 'uploadCount', 'stickerTexts', 'removeBgNow', 'generate', 'downloadZip', 'openLine', 'trendTexts', 'textDatabase', 'importTrendTexts', 'useDatabaseTexts', 'copyDatabaseTexts', 'clearTextDatabase', 'photoStyle', 'treatAsPhoto', 'companySearch', 'companySearchButton', 'levelSearch', 'levelSearchButton', 'customerSearch', 'customerResults', 'customerDetail', 'clearCustomerSearch', 'customerCount']) {
   if (!html.includes(`id="${id}"`) || !js.includes(`$("${id}")`)) throw new Error(`Missing wired control: ${id}`);
 }
-for (const token of ['encodeApng', 'makeZip', 'removeBackgroundFromCanvas', 'OFFICIAL_SPECS', 'analyzeStickerIntent', 'saveTextDatabase', 'MAX_REFERENCE_IMAGES', 'applyPhotoStyle', 'estimatePhotoScore', 'CUSTOMER_MASTER', 'searchCustomers', 'renderCustomerDetail']) {
+for (const token of ['encodeApng', 'makeZip', 'removeBackgroundFromCanvas', 'OFFICIAL_SPECS', 'analyzeStickerIntent', 'saveTextDatabase', 'MAX_REFERENCE_IMAGES', 'applyPhotoStyle', 'estimatePhotoScore', 'CUSTOMER_MASTER', 'searchCustomers', 'searchCustomersByCompany', 'searchCustomersByLevel', 'handleCompanySearch', 'handleLevelSearch', 'renderCustomerDetail']) {
   if (!js.includes(token)) throw new Error(`Missing implementation token: ${token}`);
 }
 new Function(js.replace(/^const \$ =.*$/m, ''));

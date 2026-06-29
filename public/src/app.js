@@ -124,7 +124,7 @@ const CUSTOMER_MASTER = [
     contact: "黃品妤",
     phone: "07-5566-3210",
     email: "hello@hoshino-select.example",
-    level: "潛在客戶",
+    level: "C 級客戶",
     owner: "Ken",
     status: "待跟進",
     address: "高雄市左營區博愛二路 300 號",
@@ -161,14 +161,25 @@ function renderCustomerOptions() {
 
 function searchCustomers(keyword) {
   const normalized = normalizeKeyword(keyword);
-  if (!normalized) return [];
+  if (!normalized) return CUSTOMER_MASTER;
   return CUSTOMER_MASTER.filter((customer) => customerSearchText(customer).includes(normalized)).slice(0, 8);
+}
+
+function searchCustomersByCompany(companyName) {
+  const normalized = normalizeKeyword(companyName);
+  if (!normalized) return CUSTOMER_MASTER;
+  return CUSTOMER_MASTER.filter((customer) => customer.name.toLowerCase().includes(normalized));
+}
+
+function searchCustomersByLevel(level) {
+  if (!level) return CUSTOMER_MASTER;
+  return CUSTOMER_MASTER.filter((customer) => customer.level.startsWith(level));
 }
 
 function handleCustomerSearch() {
   const keyword = $("customerSearch").value;
   const matches = searchCustomers(keyword);
-  renderCustomerResults(matches, keyword);
+  renderCustomerResults(matches, keyword || "全部客戶");
   if (matches.length === 1 || matches.some((customer) => customer.name === keyword)) {
     renderCustomerDetail(matches.find((customer) => customer.name === keyword) || matches[0]);
   } else if (matches.length > 1) {
@@ -181,10 +192,6 @@ function handleCustomerSearch() {
 }
 
 function renderCustomerResults(matches, keyword) {
-  if (!keyword.trim()) {
-    $("customerResults").innerHTML = "";
-    return;
-  }
   if (!matches.length) {
     $("customerResults").innerHTML = `<p class="hint">沒有找到符合「${escapeHtml(keyword)}」的客戶。</p>`;
     return;
@@ -219,9 +226,39 @@ function renderCustomerDetail(customer) {
   `;
 }
 
+function handleCompanySearch() {
+  const keyword = $("companySearch").value;
+  const matches = searchCustomersByCompany(keyword);
+  $("customerSearch").value = keyword;
+  renderCustomerResults(matches, keyword || "全部公司");
+  updateCustomerDetailFromMatches(matches, keyword);
+}
+
+function handleLevelSearch() {
+  const level = $("levelSearch").value;
+  const matches = searchCustomersByLevel(level);
+  $("customerSearch").value = level ? `${level} 級客戶` : "";
+  renderCustomerResults(matches, level ? `${level} 級` : "全部等級");
+  updateCustomerDetailFromMatches(matches, level);
+}
+
+function updateCustomerDetailFromMatches(matches, keyword) {
+  if (matches.length === 1) {
+    renderCustomerDetail(matches[0]);
+  } else if (matches.length > 1) {
+    $("customerDetail").className = "customer-detail empty-state";
+    $("customerDetail").textContent = `找到 ${matches.length} 筆客戶，請點選下方客戶卡片查看基本資料。`;
+  } else {
+    $("customerDetail").className = "customer-detail empty-state";
+    $("customerDetail").textContent = keyword ? "查無符合的客戶主資料。" : "請輸入關鍵字搜尋客戶主資料。";
+  }
+}
+
 function clearCustomerSearch() {
+  $("companySearch").value = "";
+  $("levelSearch").value = "";
   $("customerSearch").value = "";
-  renderCustomerResults([], "");
+  renderCustomerResults(CUSTOMER_MASTER, "全部客戶");
   $("customerDetail").className = "customer-detail empty-state";
   $("customerDetail").textContent = "請輸入關鍵字搜尋客戶主資料。";
   $("customerSearch").focus();
@@ -975,6 +1012,9 @@ $("importTrendTexts").addEventListener("click", importTrendTexts);
 $("useDatabaseTexts").addEventListener("click", useDatabaseTexts);
 $("copyDatabaseTexts").addEventListener("click", copyDatabaseTexts);
 $("clearTextDatabase").addEventListener("click", clearTextDatabase);
+$("companySearch").addEventListener("keydown", (event) => { if (event.key === "Enter") handleCompanySearch(); });
+$("companySearchButton").addEventListener("click", handleCompanySearch);
+$("levelSearchButton").addEventListener("click", handleLevelSearch);
 $("customerSearch").addEventListener("input", handleCustomerSearch);
 $("customerResults").addEventListener("click", (event) => {
   const card = event.target.closest("[data-customer-id]");
@@ -986,3 +1026,4 @@ $("clearCustomerSearch").addEventListener("click", clearCustomerSearch);
 updateCounts();
 renderTextDatabase();
 renderCustomerOptions();
+renderCustomerResults(CUSTOMER_MASTER, "全部客戶");
