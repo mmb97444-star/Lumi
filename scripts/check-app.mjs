@@ -12,7 +12,7 @@ const renderConfig = readFileSync('render.yaml', 'utf8');
 if (!html.includes('href="./styles.css"') || !html.includes('src="./src/app.js"')) {
   throw new Error('Static assets must use relative paths for GitHub Pages project URLs');
 }
-if (!html.includes('最多 10 張') || !html.includes('手機可直接選相簿') || !html.includes('Render Web 版') || !html.includes('Mac 關機也能用網址開啟')) {
+if (!html.includes('最多 10 張') || !html.includes('手機可直接選相簿') || !html.includes('Render Web 版') || !html.includes('Mac 關機也能用網址開啟') || !html.includes('業務 CRM')) {
   throw new Error('Mobile and Render deployment copy must be present');
 }
 if (!js.includes('slice(0, MAX_REFERENCE_IMAGES)') || !js.includes('detectedPhoto')) {
@@ -24,10 +24,10 @@ if (!workflow.includes('actions/deploy-pages') || !workflow.includes('path: publ
 if (!renderConfig.includes('runtime: static') || !renderConfig.includes('staticPublishPath: ./public') || !renderConfig.includes('buildCommand: npm run build') || !renderConfig.includes('generation: automatic')) {
   throw new Error('Render config must publish the static public directory');
 }
-for (const id of ['referenceImages', 'stickerType', 'uploadCount', 'stickerTexts', 'removeBgNow', 'generate', 'downloadZip', 'openLine', 'trendTexts', 'textDatabase', 'importTrendTexts', 'useDatabaseTexts', 'copyDatabaseTexts', 'clearTextDatabase', 'photoStyle', 'treatAsPhoto']) {
+for (const id of ['referenceImages', 'stickerType', 'uploadCount', 'stickerTexts', 'removeBgNow', 'generate', 'downloadZip', 'openLine', 'trendTexts', 'textDatabase', 'importTrendTexts', 'useDatabaseTexts', 'copyDatabaseTexts', 'clearTextDatabase', 'photoStyle', 'treatAsPhoto', 'customerSearch', 'customerResults', 'customerDetail', 'clearCustomerSearch', 'customerCount']) {
   if (!html.includes(`id="${id}"`) || !js.includes(`$("${id}")`)) throw new Error(`Missing wired control: ${id}`);
 }
-for (const token of ['encodeApng', 'makeZip', 'removeBackgroundFromCanvas', 'OFFICIAL_SPECS', 'analyzeStickerIntent', 'saveTextDatabase', 'MAX_REFERENCE_IMAGES', 'applyPhotoStyle', 'estimatePhotoScore']) {
+for (const token of ['encodeApng', 'makeZip', 'removeBackgroundFromCanvas', 'OFFICIAL_SPECS', 'analyzeStickerIntent', 'saveTextDatabase', 'MAX_REFERENCE_IMAGES', 'applyPhotoStyle', 'estimatePhotoScore', 'CUSTOMER_MASTER', 'searchCustomers', 'renderCustomerDetail']) {
   if (!js.includes(token)) throw new Error(`Missing implementation token: ${token}`);
 }
 new Function(js.replace(/^const \$ =.*$/m, ''));

@@ -92,6 +92,145 @@ const POSE_RULES = [
   { id: "chill", label: "放鬆漂浮", keywords: ["chill", "隨便", "都行", "沒事", "安靜", "離開"] }
 ];
 
+
+const CUSTOMER_MASTER = [
+  {
+    id: "C-1001",
+    name: "晨光設計有限公司",
+    contact: "林怡君",
+    phone: "02-2345-1001",
+    email: "yijun.lin@morning-design.example",
+    level: "A 級客戶",
+    owner: "Momo",
+    status: "合作中",
+    address: "台北市信義區松仁路 88 號",
+    note: "常用 LINE 貼圖素材與節慶行銷包。"
+  },
+  {
+    id: "C-1002",
+    name: "青禾餐飲集團",
+    contact: "陳柏翰",
+    phone: "04-2255-7788",
+    email: "service@greenrice.example",
+    level: "B 級客戶",
+    owner: "Amy",
+    status: "報價中",
+    address: "台中市西屯區市政北二路 168 號",
+    note: "需要門市活動貼圖與會員 CRM 串接。"
+  },
+  {
+    id: "C-1003",
+    name: "星野選物商行",
+    contact: "黃品妤",
+    phone: "07-5566-3210",
+    email: "hello@hoshino-select.example",
+    level: "潛在客戶",
+    owner: "Ken",
+    status: "待跟進",
+    address: "高雄市左營區博愛二路 300 號",
+    note: "對品牌吉祥物貼圖與社群素材有興趣。"
+  },
+  {
+    id: "C-1004",
+    name: "Lumi 系統顧問股份有限公司",
+    contact: "王思涵",
+    phone: "03-9876-5566",
+    email: "crm@lumi-system.example",
+    level: "A 級客戶",
+    owner: "Momo",
+    status: "續約洽談",
+    address: "桃園市中壢區青埔路 66 號",
+    note: "重視客戶主資料搜尋、業務流程與雲端部署。"
+  }
+];
+
+function normalizeKeyword(value) {
+  return value.trim().toLowerCase();
+}
+
+function customerSearchText(customer) {
+  return [customer.id, customer.name, customer.contact, customer.phone, customer.email, customer.level, customer.owner, customer.status]
+    .join(" ")
+    .toLowerCase();
+}
+
+function renderCustomerOptions() {
+  $("customerCount").textContent = `${CUSTOMER_MASTER.length} 位客戶`;
+  $("customerOptions").innerHTML = CUSTOMER_MASTER.map((customer) => `<option value="${customer.name}">${customer.contact} · ${customer.phone}</option>`).join("");
+}
+
+function searchCustomers(keyword) {
+  const normalized = normalizeKeyword(keyword);
+  if (!normalized) return [];
+  return CUSTOMER_MASTER.filter((customer) => customerSearchText(customer).includes(normalized)).slice(0, 8);
+}
+
+function handleCustomerSearch() {
+  const keyword = $("customerSearch").value;
+  const matches = searchCustomers(keyword);
+  renderCustomerResults(matches, keyword);
+  if (matches.length === 1 || matches.some((customer) => customer.name === keyword)) {
+    renderCustomerDetail(matches.find((customer) => customer.name === keyword) || matches[0]);
+  } else if (matches.length > 1) {
+    $("customerDetail").className = "customer-detail empty-state";
+    $("customerDetail").textContent = "找到多筆客戶，請點選下方客戶卡片查看基本資料。";
+  } else {
+    $("customerDetail").className = "customer-detail empty-state";
+    $("customerDetail").textContent = keyword.trim() ? "查無符合的客戶主資料。" : "請輸入關鍵字搜尋客戶主資料。";
+  }
+}
+
+function renderCustomerResults(matches, keyword) {
+  if (!keyword.trim()) {
+    $("customerResults").innerHTML = "";
+    return;
+  }
+  if (!matches.length) {
+    $("customerResults").innerHTML = `<p class="hint">沒有找到符合「${escapeHtml(keyword)}」的客戶。</p>`;
+    return;
+  }
+  $("customerResults").innerHTML = matches.map((customer) => `
+    <button class="customer-result-card" type="button" data-customer-id="${customer.id}">
+      <strong>${customer.name}</strong>
+      <span>${customer.contact} · ${customer.phone}</span>
+    </button>
+  `).join("");
+}
+
+function renderCustomerDetail(customer) {
+  $("customerDetail").className = "customer-detail";
+  $("customerDetail").innerHTML = `
+    <div class="customer-detail-head">
+      <div>
+        <span class="customer-id">${customer.id}</span>
+        <h3>${customer.name}</h3>
+      </div>
+      <span class="status-pill">${customer.status}</span>
+    </div>
+    <dl>
+      <div><dt>聯絡人</dt><dd>${customer.contact}</dd></div>
+      <div><dt>電話</dt><dd>${customer.phone}</dd></div>
+      <div><dt>Email</dt><dd>${customer.email}</dd></div>
+      <div><dt>客戶等級</dt><dd>${customer.level}</dd></div>
+      <div><dt>負責業務</dt><dd>${customer.owner}</dd></div>
+      <div><dt>地址</dt><dd>${customer.address}</dd></div>
+    </dl>
+    <p>${customer.note}</p>
+  `;
+}
+
+function clearCustomerSearch() {
+  $("customerSearch").value = "";
+  renderCustomerResults([], "");
+  $("customerDetail").className = "customer-detail empty-state";
+  $("customerDetail").textContent = "請輸入關鍵字搜尋客戶主資料。";
+  $("customerSearch").focus();
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+}
+
 function uniqueTexts(list) {
   const seen = new Set();
   return list.map((text) => text.trim()).filter((text) => text && !seen.has(text) && seen.add(text));
@@ -836,5 +975,14 @@ $("importTrendTexts").addEventListener("click", importTrendTexts);
 $("useDatabaseTexts").addEventListener("click", useDatabaseTexts);
 $("copyDatabaseTexts").addEventListener("click", copyDatabaseTexts);
 $("clearTextDatabase").addEventListener("click", clearTextDatabase);
+$("customerSearch").addEventListener("input", handleCustomerSearch);
+$("customerResults").addEventListener("click", (event) => {
+  const card = event.target.closest("[data-customer-id]");
+  if (!card) return;
+  const customer = CUSTOMER_MASTER.find((item) => item.id === card.dataset.customerId);
+  if (customer) renderCustomerDetail(customer);
+});
+$("clearCustomerSearch").addEventListener("click", clearCustomerSearch);
 updateCounts();
 renderTextDatabase();
+renderCustomerOptions();

@@ -99,6 +99,28 @@
         </div>
       </section>
 
+
+      <section class="panel crm-panel" aria-labelledby="crmTitle">
+        <div class="trend-head">
+          <div>
+            <p class="eyebrow mini-eyebrow">Business CRM</p>
+            <h2 id="crmTitle">業務 CRM｜客戶主資料搜尋</h2>
+          </div>
+          <span id="customerCount" class="pill">0 位客戶</span>
+        </div>
+        <p class="hint">在「客戶」欄位輸入公司名、聯絡人、電話或 Email，搜尋後會立即顯示客戶基本資料，方便業務快速查詢主資料。</p>
+        <div class="crm-search-row">
+          <div>
+            <label for="customerSearch">客戶</label>
+            <input id="customerSearch" list="customerOptions" type="search" placeholder="輸入客戶名稱 / 聯絡人 / 電話 / Email" autocomplete="off" />
+            <datalist id="customerOptions"></datalist>
+          </div>
+          <button id="clearCustomerSearch" class="secondary" type="button">清除搜尋</button>
+        </div>
+        <div id="customerResults" class="customer-results" aria-live="polite"></div>
+        <article id="customerDetail" class="customer-detail empty-state">請輸入關鍵字搜尋客戶主資料。</article>
+      </section>
+
       <section id="specPanel" class="panel specs"></section>
       <section id="status" class="status">尚未產生。請先上傳參考圖片或直接用內建角色生成。</section>
       <section id="gallery" class="gallery"></section>

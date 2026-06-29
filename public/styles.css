@@ -89,3 +89,27 @@ button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
   .card { border-radius: 18px; padding: 8px; }
   .card small { font-size: .72rem; }
 }
+.crm-panel { margin-top: 20px; display: grid; gap: 16px; }
+.mini-eyebrow { margin: 0 0 4px; font-size: .78rem; }
+.crm-panel h2 { margin: 0; }
+.crm-search-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+.crm-search-row button { min-height: 48px; }
+.customer-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.customer-result-card { text-align: left; border-radius: 18px; background: #f7fffa; color: var(--ink); border: 1px solid var(--border); padding: 14px; }
+.customer-result-card strong, .customer-result-card span { display: block; }
+.customer-result-card span { color: var(--muted); margin-top: 4px; font-size: .9rem; }
+.customer-detail { border: 1px solid #c7f4d7; background: linear-gradient(135deg, #fbfffd, #f1fff6); border-radius: 22px; padding: 18px; }
+.customer-detail.empty-state { color: var(--muted); font-weight: 800; }
+.customer-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.customer-detail h3 { margin: 4px 0 0; font-size: 1.35rem; }
+.customer-id { color: var(--line-dark); font-weight: 900; font-size: .84rem; }
+.status-pill { border-radius: 999px; background: #eafff1; color: var(--line-dark); border: 1px solid #bdebcf; padding: 6px 10px; font-size: .82rem; font-weight: 900; white-space: nowrap; }
+.customer-detail dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0; }
+.customer-detail dt { color: var(--muted); font-size: .78rem; font-weight: 900; }
+.customer-detail dd { margin: 3px 0 0; font-weight: 800; overflow-wrap: anywhere; }
+.customer-detail p { margin: 14px 0 0; color: var(--muted); line-height: 1.55; }
+@media (max-width: 640px) {
+  .crm-search-row, .customer-detail dl { grid-template-columns: 1fr; }
+  .customer-detail-head { display: block; }
+  .status-pill { display: inline-flex; margin-top: 10px; }
+}
