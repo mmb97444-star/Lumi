@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: lumi-line-sticker-generator
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: ./public
+    previews:
+      generation: automatic
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

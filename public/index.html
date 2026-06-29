@@ -12,7 +12,12 @@
         <div>
           <p class="eyebrow">LINE Creators Market ready</p>
           <h1>LINE 貼圖 / 動態貼圖產生器</h1>
-          <p class="lead">手機也能直接使用；可上傳最多 10 張角色參考圖，真人/寫實照片可先套用手繪、Q版、文青等風格，再依文字與提示詞產生貼圖。</p>
+          <p class="lead">Mac、手機、平板都能用瀏覽器直接開啟；可部署到 Render，不必安裝桌面程式或解壓縮舊版檔案。可上傳最多 10 張角色參考圖，真人/寫實照片可先套用手繪、Q版、文青等風格，再依文字與提示詞產生貼圖。</p>
+        </div>
+        <div class="deploy-card" aria-label="Render deployment note">
+          <span>Render Web 版</span>
+          <strong>部署後 Mac 關機也能用網址開啟</strong>
+          <p>此版本是純前端網頁；Render 會把 <code>public/</code> 放到雲端，拿到 <code>.onrender.com</code> 網址後 Safari / Chrome / Edge 皆可使用。</p>
         </div>
         <div class="hero-card">
           <strong>5 分鐘上架流程</strong>
@@ -92,6 +97,43 @@
           <button id="downloadZip" disabled>下載上架 ZIP</button>
           <button id="openLine" class="secondary">一鍵開啟 LINE 上架頁</button>
         </div>
+      </section>
+
+
+      <section class="panel crm-panel" aria-labelledby="crmTitle">
+        <div class="trend-head">
+          <div>
+            <p class="eyebrow mini-eyebrow">Business CRM</p>
+            <h2 id="crmTitle">業務 CRM｜客戶主資料搜尋</h2>
+          </div>
+          <span id="customerCount" class="pill">0 位客戶</span>
+        </div>
+        <p class="hint">在「公司」欄位輸入客戶公司名稱，或在「等級」選擇 A / B / C 後按搜尋，系統會篩選客戶清單並顯示客戶基本資料。</p>
+        <div class="crm-search-row crm-filter-grid">
+          <div>
+            <label for="companySearch">公司</label>
+            <input id="companySearch" type="search" placeholder="輸入公司名稱，例如：晨" autocomplete="off" />
+          </div>
+          <button id="companySearchButton" class="secondary search-button" type="button">搜尋</button>
+          <div>
+            <label for="levelSearch">等級</label>
+            <select id="levelSearch">
+              <option value="">全部等級</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <button id="levelSearchButton" class="secondary search-button" type="button">搜尋</button>
+          <div class="wide">
+            <label for="customerSearch">客戶快速搜尋</label>
+            <input id="customerSearch" list="customerOptions" type="search" placeholder="輸入公司 / 聯絡人 / 電話 / Email" autocomplete="off" />
+            <datalist id="customerOptions"></datalist>
+          </div>
+          <button id="clearCustomerSearch" class="secondary" type="button">清除搜尋</button>
+        </div>
+        <div id="customerResults" class="customer-results" aria-live="polite"></div>
+        <article id="customerDetail" class="customer-detail empty-state">請輸入關鍵字搜尋客戶主資料。</article>
       </section>
 
       <section id="specPanel" class="panel specs"></section>
