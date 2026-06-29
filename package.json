@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node scripts/check-app.mjs",
     "test": "node scripts/check-app.mjs",
-    "dev": "python3 -m http.server 5173 -d public"
+    "dev": "python3 -m http.server 5173 -d public",
+    "export:v10": "node scripts/export-v10.mjs"
   }
 }
