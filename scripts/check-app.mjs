@@ -21,7 +21,7 @@ if (!js.includes('slice(0, MAX_REFERENCE_IMAGES)') || !js.includes('detectedPhot
 if (!workflow.includes('actions/deploy-pages') || !workflow.includes('path: public')) {
   throw new Error('GitHub Pages workflow must deploy the public directory');
 }
-if (!renderConfig.includes('runtime: static') || !renderConfig.includes('staticPublishPath: ./public') || !renderConfig.includes('buildCommand: npm run build')) {
+if (!renderConfig.includes('runtime: static') || !renderConfig.includes('staticPublishPath: ./public') || !renderConfig.includes('buildCommand: npm run build') || !renderConfig.includes('generation: automatic')) {
   throw new Error('Render config must publish the static public directory');
 }
 for (const id of ['referenceImages', 'stickerType', 'uploadCount', 'stickerTexts', 'removeBgNow', 'generate', 'downloadZip', 'openLine', 'trendTexts', 'textDatabase', 'importTrendTexts', 'useDatabaseTexts', 'copyDatabaseTexts', 'clearTextDatabase', 'photoStyle', 'treatAsPhoto']) {

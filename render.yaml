@@ -4,7 +4,8 @@ services:
     runtime: static
     buildCommand: npm run build
     staticPublishPath: ./public
-    pullRequestPreviewsEnabled: true
+    previews:
+      generation: automatic
     routes:
       - type: rewrite
         source: /*
